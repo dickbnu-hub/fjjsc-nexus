@@ -1342,9 +1342,12 @@ function fecharPopupRecibo(){
 }
 
 function reciboAcao(acao){
+  console.log('reciboAcao chamado:', acao, 'ID:', ST._reciboFuncId);
   var id=ST._reciboFuncId;
+  if(!id){toast('Erro: ID não definido');console.error('ST._reciboFuncId vazio');return;}
   var f=ST.funcs.find(function(x){return x.id===id;});
-  if(!f){fecharPopupRecibo();return;}
+  console.log('func encontrada:', f?'sim':'NAO', 'funcs total:', ST.funcs.length);
+  if(!f){fecharPopupRecibo();toast('Erro: lançamento não encontrado');return;}
   
   // Criar/buscar recibo existente ou criar novo
   var recExist=ST.recibos.find(function(r){
@@ -4921,6 +4924,7 @@ function verRecibo(num){
 // Override reciboAcao para suportar recibo unificado
 var _reciboAcaoOrig=reciboAcao;
 function reciboAcao(acao){
+  console.log('override reciboAcao:', acao, '_reciboUnificado:', ST._reciboUnificado);
   var rec=ST._reciboUnificado||null;
   if(!rec){_reciboAcaoOrig(acao);return;}
   fecharPopupRecibo();
