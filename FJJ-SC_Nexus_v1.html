@@ -1342,11 +1342,19 @@ function fecharPopupRecibo(){
 }
 
 function reciboAcao(acao){
-  console.log('reciboAcao chamado:', acao, 'ID:', ST._reciboFuncId);
+  // Se tem recibo unificado, usar ele
+  if(ST._reciboUnificado){
+    var recU=ST._reciboUnificado;
+    ST._reciboUnificado=null;
+    fecharPopupRecibo();
+    if(acao==='imprimir'){imprimirRecibo(recU);}
+    else if(acao==='assinar'){abrirAssinatura(recU);}
+    else{toast('Recibo #'+recU.num+' salvo ✓');}
+    return;
+  }
   var id=ST._reciboFuncId;
-  if(!id){toast('Erro: ID não definido');console.error('ST._reciboFuncId vazio');return;}
+  if(!id){toast('Erro: ID não definido');return;}
   var f=ST.funcs.find(function(x){return x.id===id;});
-  console.log('func encontrada:', f?'sim':'NAO', 'funcs total:', ST.funcs.length);
   if(!f){fecharPopupRecibo();toast('Erro: lançamento não encontrado');return;}
   
   // Criar/buscar recibo existente ou criar novo
@@ -4922,17 +4930,7 @@ function verRecibo(num){
 }
 
 // Override reciboAcao para suportar recibo unificado
-var _reciboAcaoOrig=reciboAcao;
-function reciboAcao(acao){
-  console.log('override reciboAcao:', acao, '_reciboUnificado:', ST._reciboUnificado);
-  var rec=ST._reciboUnificado||null;
-  if(!rec){_reciboAcaoOrig(acao);return;}
-  fecharPopupRecibo();
-  if(acao==='imprimir'){imprimirRecibo(rec);}
-  else if(acao==='assinar'){abrirAssinatura(rec);}
-  else{toast('Recibo #'+rec.num+' salvo ✓');}
-  ST._reciboUnificado=null;
-}
+
 
 // Fechar modal ao clicar fora
 document.addEventListener('click',function(e){
